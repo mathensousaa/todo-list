@@ -1,6 +1,5 @@
 # todo-list
-A Todo List App developed for Engenharia de Software final project.
-
+Sistema de Lista de Tarefas desenvolvido como projeto final da matéria de Engenharia de Software no IFSP - campus Jacareí.
 ## Análise
 ### Mapa de Interfaces
 ### Requisitos priorizados
