@@ -5,7 +5,7 @@ Sistema de Lista de Tarefas desenvolvido como projeto final da matéria de Engen
 ### Requisitos priorizados
 ### Diagrama de Casos de Uso
 
-![Diagrama de Casos de Uso]([https://github.com/[username]/[reponame]/blob/[branch]/image.jpg?raw=true](https://raw.githubusercontent.com/mathensousaa/todo-list/main/documents/casos-de-uso.png))
+![alt text](https://github.com/mathensousaa/todo-list/blob/main/casos-de-uso.png?raw=true)
 
 ### Diagrama de sequeência do Sistema dos casos de uso
 
