@@ -1,4 +1,4 @@
-import './style.css'
+import 'tailwindcss/tailwind.css';
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <div class="bg-black">
