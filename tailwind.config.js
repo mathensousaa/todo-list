@@ -8,6 +8,10 @@ export default {
     "./src/**/*.tsx",
   ],
   theme: {
+    //font-family inter
+    fontFamily: {
+      sans: ["Inter", "sans-serif"],
+    },
     extend: {},
   },
   plugins: [],
