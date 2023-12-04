@@ -38,7 +38,7 @@
           <div class="md:w-1/3 flex flex-col gap-2">
             <header class="flex justify-between">
               <h2>A fazer</h2>
-              <button class="btn-ghost">
+              <button id="botao-adicionar-tarefa-a-fazer" class="btn-ghost">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="17"
@@ -63,10 +63,10 @@
                 </svg>
               </button>
             </header>
-            <div>
-              <div id="tarefas-a-fazer"></div>
+            <div class="flex flex-col gap-2">
+              <div id="tarefas-a-fazer" class="flex flex-col gap-2"></div>
               <button
-                id="adicionar-tarefa-a-fazer"
+                id="botao-adicionar-tarefa-a-fazer"
                 class="flex rounded-md border-[1px] border-gray-400 border-dashed items-center justify-center w-full gap-1 p-4 text-gray-400 bg-gray-100"
               >
                 <div class="p-1 bg-white rounded-full">
@@ -101,7 +101,10 @@
           <div class="md:w-1/3 flex flex-col gap-2">
             <header class="flex justify-between">
               <h2>Em andamento</h2>
-              <button class="btn-ghost">
+              <button
+                id="botao-adicionar-tarefa-em-andamento"
+                class="btn-ghost"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="17"
@@ -127,8 +130,9 @@
               </button>
             </header>
             <div class="flex flex-col gap-2">
-              <div id="tarefas-em-andamento" class="flex flex-col gap-2">
+              <div id="tarefas-em-andamento" class="flex flex-col gap-2 flex-1">
                 <div
+                  id="1"
                   class="task bg-white rounded-md border-l-4 border-[1px] p-4 flex justify-between items-center gap-4"
                 >
                   <button
@@ -407,7 +411,7 @@
                 </div>
               </div>
               <button
-                id="adicionar-tarefa-em-andamento"
+                id="botao-adicionar-tarefa-em-andamento"
                 class="flex rounded-md border-[1px] border-gray-400 border-dashed items-center justify-center w-full gap-1 p-4 text-gray-400 bg-gray-100"
               >
                 <div class="p-1 bg-white rounded-full">
@@ -442,7 +446,7 @@
           <div class="md:w-1/3 flex flex-col gap-2">
             <header class="flex justify-between">
               <h2>Concluída</h2>
-              <button class="btn-ghost">
+              <button id="botao-adicionar-tarefa-concluida" class="btn-ghost">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="17"
@@ -467,10 +471,10 @@
                 </svg>
               </button>
             </header>
-            <div>
-              <div id="tarefas-concluidas"></div>
+            <div class="flex flex-col gap-2">
+              <div id="tarefas-concluidas" class="flex flex-col gap-2"></div>
               <button
-                id="adicionar-tarefa-concluida"
+                id="botao-adicionar-tarefa-concluida"
                 class="flex rounded-md border-[1px] border-gray-400 border-dashed items-center justify-center w-full gap-1 p-4 text-gray-400 bg-gray-100"
               >
                 <div class="p-1 bg-white rounded-full">
@@ -503,8 +507,23 @@
           </div>
         </section>
       </main>
+
+      <div
+        id="toast-erro"
+        class="toast-erro hidden fixed right-4 sm:w-[360px] w-[calc(100%-2rem)] h-fit top-4 sm:bottom-4 sm:top-auto :bottom-4 rounded-md shadow-md transition-all min-h-[58px]"
+      >
+        <p id="titulo-toast-erro" class="font-semibold text-sm"></p>
+        <p id="mensagem-toast-erro" class="text-sm"></p>
+      </div>
+
+      <div
+        id="toast-sucesso"
+        class="toast-sucesso hidden fixed right-4 sm:w-[360px] w-[calc(100%-2rem)] h-fit top-4 sm:bottom-4 sm:top-auto rounded-md shadow-md transition-all min-h-[58px]"
+      >
+        <p id="titulo-toast-sucesso" class="font-semibold text-sm"></p>
+        <p id="mensagem-toast-sucesso" class="text-sm"></p>
+      </div>
     </div>
-    <div></div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

@@ -1,11 +1,10 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  mode: 'jit',
   content: [
     "./index.html",
     "./src/**/*.html",
-    "./src/**/*.vue",
-    "./src/**/*.jsx",
-    "./src/**/*.tsx",
+    "./src/**/*.ts",
   ],
   theme: {
     //font-family inter
