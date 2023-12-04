@@ -676,3 +676,29 @@ class InterfaceGrafica {
 }
 
 const interfaceGrafica = new InterfaceGrafica();
+
+const botaoEditarTarefa = document.getElementById("botao-editar-tarefa");
+const dialogEditarTarefa = document.getElementById("dialog-editar-tarefa");
+const botaoCancelarEditarTarefa = document.getElementById(
+  "botao-cancelar-edicao"
+);
+
+console.log(botaoEditarTarefa);
+console.log(dialogEditarTarefa);
+console.log(botaoCancelarEditarTarefa);
+
+botaoEditarTarefa?.addEventListener("click", () => {
+  exibirDialogEditarTarefa();
+});
+
+function exibirDialogEditarTarefa(): void {
+  dialogEditarTarefa?.classList.remove("hidden");
+}
+
+botaoCancelarEditarTarefa?.addEventListener("click", () => {
+  fecharDialogEditarTarefa();
+});
+
+function fecharDialogEditarTarefa(): void {
+  dialogEditarTarefa?.classList.add("hidden");
+}
