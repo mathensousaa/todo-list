@@ -683,10 +683,6 @@ const botaoCancelarEditarTarefa = document.getElementById(
   "botao-cancelar-edicao"
 );
 
-console.log(botaoEditarTarefa);
-console.log(dialogEditarTarefa);
-console.log(botaoCancelarEditarTarefa);
-
 botaoEditarTarefa?.addEventListener("click", () => {
   exibirDialogEditarTarefa();
 });
