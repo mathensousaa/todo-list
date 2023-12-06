@@ -7,6 +7,7 @@
     <title>Vite + TS</title>
     <link href="/src/style.css" rel="stylesheet" />
   </head>
+
   <body>
     <div id="app" class="min-h-screen w-screen flex flex-col">
       <!-- Header -->
@@ -130,349 +131,10 @@
               </button>
             </header>
             <div class="flex flex-col gap-2">
-              <div id="tarefas-em-andamento" class="flex flex-col gap-2 flex-1">
-                <div
-                  id="1"
-                  class="task bg-white rounded-md border-l-4 border-[1px] p-4 flex justify-between items-center gap-4"
-                >
-                  <button
-                    class="rounded-full bg-gray-100 h-8 w-8 flex justify-center items-center hover:bg-green-500 transition-all"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="18"
-                      height="13"
-                      viewBox="0 0 18 13"
-                      fill="none"
-                    >
-                      <path
-                        d="M15.0666 2L6.2666 10.8L2.2666 6.8"
-                        stroke="white"
-                        stroke-width="4"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                    </svg>
-                  </button>
-                  <div class="flex-1">
-                    <span class="text-sm">Nome da tarefa</span>
-                    <div class="flex gap-1">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="17"
-                        height="16"
-                        viewBox="0 0 17 16"
-                        fill="none"
-                      >
-                        <path
-                          d="M13.3333 2.66678H3.99996C3.26358 2.66678 2.66663 3.26373 2.66663 4.00011V13.3334C2.66663 14.0698 3.26358 14.6668 3.99996 14.6668H13.3333C14.0697 14.6668 14.6666 14.0698 14.6666 13.3334V4.00011C14.6666 3.26373 14.0697 2.66678 13.3333 2.66678Z"
-                          stroke="#6B7280"
-                          stroke-width="1.33333"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                        <path
-                          d="M11.3333 1.33325V3.99992"
-                          stroke="#6B7280"
-                          stroke-width="1.33333"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                        <path
-                          d="M5.99988 1.33325V3.99992"
-                          stroke="#6B7280"
-                          stroke-width="1.33333"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                        <path
-                          d="M2.66663 6.66678H14.6666"
-                          stroke="#6B7280"
-                          stroke-width="1.33333"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                        <path
-                          d="M5.99988 9.33325H6.00988"
-                          stroke="#6B7280"
-                          stroke-width="1.33333"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                        <path
-                          d="M8.66663 9.33325H8.67663"
-                          stroke="#6B7280"
-                          stroke-width="1.33333"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                        <path
-                          d="M11.3333 9.33325H11.3433"
-                          stroke="#6B7280"
-                          stroke-width="1.33333"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                        <path
-                          d="M5.99988 12H6.00988"
-                          stroke="#6B7280"
-                          stroke-width="1.33333"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                        <path
-                          d="M8.66663 12H8.67663"
-                          stroke="#6B7280"
-                          stroke-width="1.33333"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                        <path
-                          d="M11.3333 12H11.3433"
-                          stroke="#6B7280"
-                          stroke-width="1.33333"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                        <span class="text-xs text-gray-500">Hoje</span>
-                      </svg>
-                    </div>
-                  </div>
-                  <span class="text-xs text-gray-500">Categoria</span>
-                  <div class="flex justify-end">
-                    <!-- Popover -->
-                    <div
-                      id="popover"
-                      class="w-[216px] mt-10 absolute rounded-md bg-white shadow-md hidden text-sm font-medium"
-                    >
-                      <div
-                        class="popover-header font-semibold border-b-[1px] border-gray-100 p-3 text-blue-950"
-                      >
-                        Opções
-                      </div>
-                      <div class="popover-body p-1">
-                        <ul class="flex flex-col gap-2">
-                          <li
-                            class="flex gap-2 items-center hover:bg-gray-100 rounded-md"
-                          >
-                            <button
-                              id="botao-editar-tarefa"
-                              class="w-full flex items-center gap-2 p-2"
-                            >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="16"
-                                height="16"
-                                viewBox="0 0 16 16"
-                                fill="none"
-                              >
-                                <g clip-path="url(#clip0_85_1221)">
-                                  <path
-                                    d="M11.3334 2.00022C11.5085 1.82513 11.7163 1.68623 11.9451 1.59147C12.1739 1.49671 12.4191 1.44794 12.6667 1.44794C12.9143 1.44794 13.1595 1.49671 13.3883 1.59147C13.6171 1.68623 13.8249 1.82513 14 2.00022C14.1751 2.17532 14.314 2.38319 14.4088 2.61196C14.5036 2.84073 14.5523 3.08593 14.5523 3.33355C14.5523 3.58118 14.5036 3.82638 14.4088 4.05515C14.314 4.28392 14.1751 4.49179 14 4.66689L5.00004 13.6669L1.33337 14.6669L2.33337 11.0002L11.3334 2.00022Z"
-                                    stroke="#334155"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                  />
-                                </g>
-                                <defs>
-                                  <clipPath id="clip0_85_1221">
-                                    <rect
-                                      width="16"
-                                      height="16"
-                                      fill="white"
-                                      transform="translate(0 0.000244141)"
-                                    />
-                                  </clipPath>
-                                </defs>
-                              </svg>
-                              <span>Editar tarefa</span>
-                            </button>
-                            <div
-                              id="dialog-editar-tarefa"
-                              class="relative z-10 hidden"
-                              aria-labelledby="modal-title"
-                              role="dialog"
-                              aria-modal="true"
-                            >
-                              <div
-                                class="fixed inset-0 z-10 w-screen overflow-y-auto"
-                              >
-                                <div
-                                  class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0"
-                                >
-                                  <div
-                                    class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg"
-                                  >
-                                    <div
-                                      class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4"
-                                    >
-                                      <div class="sm:flex sm:items-start">
-                                        <div
-                                          class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left"
-                                        >
-                                          <h3
-                                            class="text-base font-semibold leading-6 text-gray-900"
-                                            id="modal-title"
-                                          >
-                                            Editar Tarefa
-                                          </h3>
-                                          <div class="mt-2">
-                                            <p class="text-sm text-gray-500">
-                                              Faça alterações em sua tarefa
-                                              aqui. Clique em salvar quando
-                                              terminar.
-                                            </p>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <div
-                                      class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6"
-                                    >
-                                      <button
-                                        type="submit"
-                                        class="inline-flex w-full justify-center rounded-md bg-blue-900 px-3 py-2 text-sm font-semibold text-white shadow-sm sm:ml-3 sm:w-auto"
-                                      >
-                                        Salvar
-                                      </button>
-                                      <button
-                                        id = "botao-cancelar-edicao"
-                                        type="button"
-                                        class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                                      >
-                                        Cancelar
-                                      </button>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </li>
-                          <li
-                            class="flex gap-2 items-center hover:bg-gray-100 rounded-md"
-                          >
-                            <button class="w-full flex items-center gap-2 p-2">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="16"
-                                height="16"
-                                viewBox="0 0 16 16"
-                                fill="none"
-                              >
-                                <path
-                                  d="M13.3334 3.33356H6.00004L1.33337 8.00022L6.00004 12.6669H13.3334C13.687 12.6669 14.0261 12.5264 14.2762 12.2764C14.5262 12.0263 14.6667 11.6872 14.6667 11.3336V4.66689C14.6667 4.31327 14.5262 3.97413 14.2762 3.72408C14.0261 3.47403 13.687 3.33356 13.3334 3.33356Z"
-                                  stroke="#334155"
-                                  stroke-width="2"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                />
-                                <path
-                                  d="M12 6.00024L8 10.0002"
-                                  stroke="#334155"
-                                  stroke-width="2"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                />
-                                <path
-                                  d="M8 6.00024L12 10.0002"
-                                  stroke="#172554"
-                                  stroke-width="2"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                />
-                              </svg>
-                              <span>Excluir tarefa</span>
-                            </button>
-                          </li>
-                        </ul>
-                      </div>
-                      <div
-                        class="popover-footer border-t-[1px] border-gray-100 p-1 text-blue-950"
-                      >
-                        <ul class="flex flex-col gap-2">
-                          <li
-                            class="flex gap-2 items-center hover:bg-gray-100 rounded-md"
-                          >
-                            <button
-                              id="botao-fechar-popover"
-                              class="w-full flex items-center gap-2 p-2"
-                            >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="16"
-                                height="16"
-                                viewBox="0 0 16 16"
-                                fill="none"
-                              >
-                                <path
-                                  d="M6 14.0002H3.33333C2.97971 14.0002 2.64057 13.8598 2.39052 13.6097C2.14048 13.3597 2 13.0205 2 12.6669V3.33358C2 2.97996 2.14048 2.64082 2.39052 2.39077C2.64057 2.14072 2.97971 2.00024 3.33333 2.00024H6"
-                                  stroke="#334155"
-                                  stroke-width="2"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                />
-                                <path
-                                  d="M10.6666 11.3336L14 8.00026L10.6666 4.66693"
-                                  stroke="#334155"
-                                  stroke-width="2"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                />
-                                <path
-                                  d="M14 8.00024H6"
-                                  stroke="#172554"
-                                  stroke-width="2"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                />
-                              </svg>
-                              <span>Fechar</span>
-                            </button>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-                    <button
-                      id="botao-popover"
-                      class="bg-gray-50 text-white p-2 border-[1px] border-gray-100 rounded-md hover:bg-gray-100"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="17"
-                        height="16"
-                        viewBox="0 0 17 16"
-                        fill="none"
-                      >
-                        <path
-                          d="M8.66667 8.66667C9.03486 8.66667 9.33333 8.36819 9.33333 8C9.33333 7.63181 9.03486 7.33334 8.66667 7.33334C8.29848 7.33334 8 7.63181 8 8C8 8.36819 8.29848 8.66667 8.66667 8.66667Z"
-                          fill="#9CA3AF"
-                          stroke="#9CA3AF"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                        <path
-                          d="M8.66667 4C9.03486 4 9.33333 3.70152 9.33333 3.33333C9.33333 2.96514 9.03486 2.66666 8.66667 2.66666C8.29848 2.66666 8 2.96514 8 3.33333C8 3.70152 8.29848 4 8.66667 4Z"
-                          fill="#9CA3AF"
-                          stroke="#9CA3AF"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                        <path
-                          d="M8.66667 13.3333C9.03486 13.3333 9.33333 13.0349 9.33333 12.6667C9.33333 12.2985 9.03486 12 8.66667 12C8.29848 12 8 12.2985 8 12.6667C8 13.0349 8.29848 13.3333 8.66667 13.3333Z"
-                          fill="#9CA3AF"
-                          stroke="#9CA3AF"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <div
+                id="tarefas-em-andamento"
+                class="flex flex-col gap-2 flex-1"
+              ></div>
               <button
                 id="botao-adicionar-tarefa-em-andamento"
                 class="flex rounded-md border-[1px] border-gray-400 border-dashed items-center justify-center w-full gap-1 p-4 text-gray-400 bg-gray-100"
@@ -585,6 +247,170 @@
       >
         <p id="titulo-toast-sucesso" class="font-semibold text-sm"></p>
         <p id="mensagem-toast-sucesso" class="text-sm"></p>
+      </div>
+
+      <!-- Modal Editar Tarefa -->
+      <div
+        id="dialog-editar-tarefa"
+        class="relative z-10"
+        aria-labelledby="modal-title"
+        role="dialog"
+        aria-modal="true"
+      >
+        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+          <div
+            class="flex min-h-full items-end border justify-center p-4 text-center sm:items-center sm:p-0"
+          >
+            <div
+              class="relative transform overflow-hidden border rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg"
+            >
+              <form id="formulario-editar-tarefa">
+                <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                  <div class="sm:flex sm:items-start">
+                    <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                      <h3
+                        class="text-base font-semibold leading-6 text-gray-900"
+                        id="modal-title"
+                      >
+                        Editar Tarefa
+                      </h3>
+                      <div class="mt-2">
+                        <p class="text-sm text-gray-500">
+                          Faça alterações em sua tarefa aqui. Clique em salvar
+                          quando terminar.
+                        </p>
+                      </div>
+                      <div class="flex flex-col gap-2">
+                        <div class="flex items-center gap-3">
+                          <label
+                            for="campo-editar-descricao-tarefa"
+                            class="text-sm font-bold font-medium text-gray-700 text-end w-20"
+                          >
+                            Tarefa
+                          </label>
+                          <input
+                            type="text"
+                            name="campo-editar-descricao-tarefa"
+                            id="campo-editar-descricao-tarefa"
+                            placeholder="Descrição da Tarefa"
+                            value=""
+                            class="flex-1"
+                          />
+                        </div>
+                        <div class="flex items-center gap-3">
+                          <label
+                            for="campo-editar-categoria-tarefa"
+                            class="text-sm font-bold font-medium text-gray-700 text-end w-20"
+                          >
+                            Categoria
+                          </label>
+                          <input
+                            type="text"
+                            name="campo-editar-categoria-tarefa"
+                            id="campo-editar-categoria-tarefa"
+                            placeholder="Categoria da Tarefa"
+                            value=""
+                            class="flex-1"
+                          />
+                        </div>
+                        <div class="flex items-center gap-3">
+                          <label
+                            for="campo-editar-categoria-tarefa"
+                            class="text-sm font-bold font-medium text-gray-700 text-end w-20"
+                          >
+                            Data
+                          </label>
+                          <input
+                            type="date"
+                            name="campo-editar-categoria-tarefa"
+                            id="campo-editar-categoria-tarefa"
+                            placeholder="Data de conclusão pretendida"
+                            value=""
+                            class="flex-1"
+                          />
+                        </div>
+                      </div>
+                      
+                      
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6"
+                >
+                  <button
+                    type="submit"
+                    class="inline-flex w-full justify-center rounded-md bg-blue-900 px-3 py-2 text-sm font-semibold text-white shadow-sm sm:ml-3 sm:w-auto"
+                  >
+                    Salvar
+                  </button>
+                  <button
+                    id="botao-cancelar-edicao"
+                    type="button"
+                    class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        id="dialog-excluir-tarefa"
+        class="relative z-10 hidden"
+        aria-labelledby="modal-title"
+        role="dialog"
+        aria-modal="true"
+      >
+        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+          <div
+            class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0"
+          >
+            <div
+              class="relative transform overflow-hidden border rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg"
+            >
+              <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                  <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                    <h3
+                      class="text-base font-semibold leading-6 text-gray-900"
+                      id="modal-title"
+                    >
+                      Excluir Tarefa
+                    </h3>
+                    <div class="mt-2">
+                      <p class="text-sm text-gray-500">
+                        Esta ação não pode ser revertida. A categoria será
+                        excluída permanentemente.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6"
+              >
+                <button
+                  id="botao-excluir-tarefa"
+                  type="button"
+                  class="inline-flex w-full justify-center rounded-md bg-red-900 px-3 py-2 text-sm font-semibold text-white shadow-sm sm:ml-3 sm:w-auto"
+                >
+                  Excluir
+                </button>
+                <button
+                  id="botao-cancelar-excluir-tarefa"
+                  type="button"
+                  class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <script type="module" src="/src/main.ts"></script>
