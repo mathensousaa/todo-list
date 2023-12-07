@@ -45,13 +45,13 @@ class GerenciadorTarefa {
             if (!descricao) {
                 throw new Error('Descrição da tarefa não informada!');
             }
-
-            const idTarefa = this.tarefas.length + 1;
+    
+            const idTarefa = this.obterProximoId();
             const novaTarefa = new Tarefa(idTarefa, descricao, this.obterStatusDaTarefa());
-
+    
             this.tarefas.push(novaTarefa);
             this.atualizarTarefasNoLocalStorage();
-
+    
             return {
                 resultado: 'sucesso',
                 titulo: 'Tarefa criada com sucesso!',
@@ -64,6 +64,11 @@ class GerenciadorTarefa {
             };
         }
     }
+    
+    private obterProximoId(): number {
+        const ultimoId = this.tarefas.length > 0 ? this.tarefas[this.tarefas.length - 1].getId() : 0;
+        return ultimoId + 1;
+    }
 
     public editarTarefa(idTarefa: number, novaDescricao: string, novoStatus: string, novaCategoria: string): void {
         // Implementar lógica para editar uma tarefa existente
@@ -71,13 +76,13 @@ class GerenciadorTarefa {
 
     public excluirTarefa(idTarefa: number): { resultado: string, titulo: string, mensagem?: string } {
         try {
-            const tarefa = this.encontrarTarefaPeloId(idTarefa);
+            const indiceParaRemover = this.tarefas.findIndex(tarefa => tarefa.id === idTarefa);
 
-            if (!tarefa) {
-                throw new Error('Tarefa não encontrada!');
+            if (indiceParaRemover === -1) {
+                throw new Error(`Tarefa ${idTarefa} não encontrada!`);
             }
 
-            this.tarefas = this.tarefas.filter(tarefa => tarefa.id !== idTarefa);
+            this.tarefas.splice(indiceParaRemover, 1);
             this.atualizarTarefasNoLocalStorage();
 
             return {
@@ -266,7 +271,8 @@ class InterfaceGrafica {
     private dialogEditarTarefa: HTMLDivElement | null = null;
     private dialogExcluirTarefa: HTMLDivElement | null = null;
     private botaoCancelarEditarTarefa: HTMLButtonElement | null = null;
-    private botaoExcluirTarefa: HTMLButtonElement | null = null;
+    private botaoAcaoExcluirTarefa: HTMLButtonElement | null = null;
+    private botaoCancelarExcluirTarefa: HTMLButtonElement | null = null;
 
     constructor() {
         this.gerenciadorTarefa = new GerenciadorTarefa();
@@ -288,8 +294,8 @@ class InterfaceGrafica {
 
         this.dialogEditarTarefa = document.getElementById("dialog-editar-tarefa") as HTMLDivElement;
         this.dialogExcluirTarefa = document.getElementById("dialog-excluir-tarefa") as HTMLDivElement;
-        this.botaoCancelarEditarTarefa = document.getElementById("botao-cancelar-excluir-tarefa") as HTMLButtonElement;
-        this.botaoExcluirTarefa = document.getElementById("botao-excluir-tarefa") as HTMLButtonElement;
+        this.botaoCancelarExcluirTarefa = document.getElementById("botao-cancelar-excluir-tarefa") as HTMLButtonElement;
+        this.botaoAcaoExcluirTarefa = document.getElementById("botao-acao-excluir-tarefa") as HTMLButtonElement;
 
         this.exibirTarefas();
 
@@ -298,6 +304,7 @@ class InterfaceGrafica {
             const descricao = this.campoDescricaoTarefa.value;
             const resposta = this.gerenciadorTarefa.criarTarefa(descricao);
             this.campoDescricaoTarefa.value = "";
+            this.campoDescricaoTarefa.placeholder = "Adicionar Tarefa";
             this.exibirToast(resposta.resultado, resposta.titulo, resposta.mensagem);
             this.removerStatusTarefaDaURL();
             this.exibirTarefas();
@@ -308,7 +315,7 @@ class InterfaceGrafica {
                 this.removerStatusTarefaDaURL();
                 this.campoDescricaoTarefa.focus();
                 this.campoDescricaoTarefa.placeholder = "Adicionar Tarefa A Fazer";
-                this.exibirTarefas();
+                
             })
         })
 
@@ -318,7 +325,6 @@ class InterfaceGrafica {
                 this.adicionarStatusTarefaURL(1);
                 this.campoDescricaoTarefa.focus();
                 this.campoDescricaoTarefa.placeholder = "Adicionar Tarefa Em Andamento";
-                this.exibirTarefas();
             })
         })
 
@@ -328,7 +334,6 @@ class InterfaceGrafica {
                 this.adicionarStatusTarefaURL(2);
                 this.campoDescricaoTarefa.focus();
                 this.campoDescricaoTarefa.placeholder = "Adicionar Tarefa Concluída";
-                this.exibirTarefas();
             })
         })
 
@@ -384,9 +389,9 @@ class InterfaceGrafica {
         this.AdicionarEventosBotaoDefinirStatusConcluida();
 
         this.iniciarBotoesOpcoesTarefa();
-        console.log(this.botoesEditarTarefa);
-        console.log(this.botoesExcluirTarefa);
         this.AdicionarEventosBotoesOpcoesTarefa();
+
+        this.AdicionarEventosBotoesAcaoTarefa();
     }
 
     private cardTarefa(tarefa: Tarefa): HTMLDivElement {
@@ -734,7 +739,7 @@ class InterfaceGrafica {
     }
 
     private iniciarBotoesDefinirStatusConcluida(): void {
-        this.botoesDefinirStatusConcluida = document.querySelectorAll('[id^="botao-definir-status-concluida"]');
+        this.botoesDefinirStatusConcluida = document.querySelectorAll('[id^="botao-definir-status-concluida-"]');
     }
 
     private AdicionarEventosBotaoDefinirStatusConcluida(): void {
@@ -751,40 +756,59 @@ class InterfaceGrafica {
     }
 
     private iniciarBotoesOpcoesTarefa(): void {
-        this.botoesEditarTarefa = document.querySelectorAll('[id^="botao-editar-tarefa"]');
-        this.botoesExcluirTarefa = document.querySelectorAll('[id^="botao-excluir-tarefa"]');
+        this.botoesEditarTarefa = document.querySelectorAll('[id^="botao-editar-tarefa-"]');
+        this.botoesExcluirTarefa = document.querySelectorAll('[id^="botao-excluir-tarefa-"]');
     }
 
     private AdicionarEventosBotoesOpcoesTarefa(): void {
         if (this.botoesExcluirTarefa) {
             this.botoesExcluirTarefa?.forEach((botao, indice) => {
                 botao.addEventListener("click", () => {
-                    console.log("clicou")
                     const botaoExcluirTarefa = this.botoesExcluirTarefa?.[indice];
                     const idTarefa = botaoExcluirTarefa?.id.split('-').pop();
-                    this.exibirDialogExcluirTarefa();
-
-                    this.botaoCancelarEditarTarefa?.addEventListener("click", () => {
-                        this.fecharDialogExcluirTarefa();
-                    })
-
-                    this.botaoExcluirTarefa?.addEventListener("click", () => {
-                        this.fecharDialogExcluirTarefa();
-                        const resposta = this.gerenciadorTarefa.excluirTarefa(Number(idTarefa));
-                        this.exibirToast(resposta.resultado, resposta.titulo, resposta.mensagem);
-                        this.exibirTarefas();
-                    })
+                    this.exibirDialogExcluirTarefa(Number(idTarefa));
                 })
             })
         }
     }
 
-    private exibirDialogExcluirTarefa(): void {
+    private AdicionarEventosBotoesAcaoTarefa(): void {
+        if (this.botaoAcaoExcluirTarefa) {
+            this.botaoAcaoExcluirTarefa?.removeEventListener("click", this.OnBotaoExcluirTarefaClick);
+            this.botaoAcaoExcluirTarefa?.addEventListener("click", this.OnBotaoExcluirTarefaClick);
+        }
+
+        if (this.botaoCancelarExcluirTarefa) {
+            this.botaoCancelarExcluirTarefa?.removeEventListener("click", this.OnBotaoCancelarExcluirTarefaClick);
+            this.botaoCancelarExcluirTarefa?.addEventListener("click", this.OnBotaoCancelarExcluirTarefaClick);
+        }
+    }
+
+    private OnBotaoExcluirTarefaClick = (evento: MouseEvent): void => {
+        console.log(this.botaoAcaoExcluirTarefa?.id);
+        const idTarefa = this.botaoAcaoExcluirTarefa?.id.split('-').pop();
+        const resposta = this.gerenciadorTarefa.excluirTarefa(Number(idTarefa));
+        this.exibirTarefas();
+        this.fecharDialogExcluirTarefa();
+        this.exibirToast(resposta.resultado, resposta.titulo, resposta.mensagem);
+    }
+
+    private OnBotaoCancelarExcluirTarefaClick = (): void => {
+        this.fecharDialogExcluirTarefa();
+    }
+
+    private exibirDialogExcluirTarefa(idTarefa: number): void {
         this.dialogExcluirTarefa?.classList.remove("hidden");
+        if (this.botaoAcaoExcluirTarefa) {
+            (this.botaoAcaoExcluirTarefa as HTMLElement).id = this.botaoAcaoExcluirTarefa.id + "-" + idTarefa;
+        }
     }
 
     private fecharDialogExcluirTarefa(): void {
         this.dialogExcluirTarefa?.classList.add("hidden");
+        if (this.botaoAcaoExcluirTarefa) {
+            (this.botaoAcaoExcluirTarefa as HTMLElement).id = "botao-acao-excluir-tarefa";
+        }
     }
 }
 
