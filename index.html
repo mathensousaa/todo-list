@@ -8,14 +8,14 @@
     <link href="/src/style.css" rel="stylesheet" />
   </head>
 
-  <body>
+  <body class="overflow-x-hidden">
     <div id="app" class="min-h-screen w-screen flex flex-col">
       <!-- Header -->
-      <header class="sm:px-16 sm:py-4 px-2 py-1">
+      <header class="lg:px-16 md:px-6 sm:py-4 px-2 py-1">
         <h1 class="">Todo List</h1>
       </header>
       <main
-        class="main bg-zinc-50 flex-1 sm:px-16 px-2 flex flex-col items-center sm:gap-0 gap-4"
+        class="main bg-zinc-50 flex-1 lg:px-16 md:px-6 px-2 flex flex-col items-center sm:gap-0 gap-4"
       >
         <!-- Formulário de adição de Tarefa -->
         <section class="sm:w-[620px] w-full">
@@ -34,9 +34,9 @@
           </form>
         </section>
         <!-- Todas as tarefas -->
-        <section class="w-full flex md:flex-row gap-4 flex-col">
+        <section class="w-full flex md:flex-row gap-4 flex-col mb-32">
           <!-- Coluna de Tarefas A fazer -->
-          <div class="md:w-1/3 flex flex-col gap-2">
+          <div class="sm:w-1/3 flex flex-col gap-2">
             <header class="flex justify-between">
               <h2>A fazer</h2>
               <button id="botao-adicionar-tarefa-a-fazer" class="btn-ghost">
@@ -65,7 +65,10 @@
               </button>
             </header>
             <div class="flex flex-col gap-2">
-              <div id="tarefas-a-fazer" class="flex flex-col gap-2"></div>
+              <div
+                id="tarefas-a-fazer"
+                class="flex flex-col gap-2 coluna min-h-[68px]"
+              ></div>
               <button
                 id="botao-adicionar-tarefa-a-fazer"
                 class="flex rounded-md border-[1px] border-gray-400 border-dashed items-center justify-center w-full gap-1 p-4 text-gray-400 bg-gray-100"
@@ -99,7 +102,7 @@
             </div>
           </div>
           <!-- Coluna de Tarefas Em andamento -->
-          <div class="md:w-1/3 flex flex-col gap-2">
+          <div class="sm:w-1/3 flex flex-col gap-2">
             <header class="flex justify-between">
               <h2>Em andamento</h2>
               <button
@@ -133,7 +136,7 @@
             <div class="flex flex-col gap-2">
               <div
                 id="tarefas-em-andamento"
-                class="flex flex-col gap-2 flex-1"
+                class="flex flex-col gap-2 flex-1 coluna min-h-[68px]"
               ></div>
               <button
                 id="botao-adicionar-tarefa-em-andamento"
@@ -168,7 +171,7 @@
             </div>
           </div>
           <!-- Coluna de Tarefas Concluídas -->
-          <div class="md:w-1/3 flex flex-col gap-2">
+          <div class="sm:w-1/3 flex flex-col gap-2">
             <header class="flex justify-between">
               <h2>Concluída</h2>
               <button id="botao-adicionar-tarefa-concluida" class="btn-ghost">
@@ -197,7 +200,10 @@
               </button>
             </header>
             <div class="flex flex-col gap-2">
-              <div id="tarefas-concluidas" class="flex flex-col gap-2"></div>
+              <div
+                id="tarefas-concluidas"
+                class="flex flex-col gap-2 coluna min-h-[68px]"
+              ></div>
               <button
                 id="botao-adicionar-tarefa-concluida"
                 class="flex rounded-md border-[1px] border-gray-400 border-dashed items-center justify-center w-full gap-1 p-4 text-gray-400 bg-gray-100"
@@ -233,48 +239,56 @@
         </section>
       </main>
 
+      <!-- Toasts -->
       <div
         id="toast-erro"
         class="toast-erro hidden fixed right-4 sm:w-[360px] w-[calc(100%-2rem)] h-fit top-4 sm:bottom-4 sm:top-auto :bottom-4 rounded-md shadow-md transition-all min-h-[58px]"
       >
-        <p id="titulo-toast-erro" class="font-semibold text-sm"></p>
-        <p id="mensagem-toast-erro" class="text-sm"></p>
+        <p
+          id="titulo-toast-erro"
+          class="font-semibold text-sm text-red-950"
+        ></p>
+        <p id="mensagem-toast-erro" class="text-sm text-red-950"></p>
       </div>
 
       <div
         id="toast-sucesso"
         class="toast-sucesso hidden fixed right-4 sm:w-[360px] w-[calc(100%-2rem)] h-fit top-4 sm:bottom-4 sm:top-auto rounded-md shadow-md transition-all min-h-[58px]"
       >
-        <p id="titulo-toast-sucesso" class="font-semibold text-sm"></p>
-        <p id="mensagem-toast-sucesso" class="text-sm"></p>
+        <p
+          id="titulo-toast-sucesso"
+          class="font-semibold text-sm text-green-950"
+        ></p>
+        <p id="mensagem-toast-sucesso" class="text-sm text-green-950"></p>
       </div>
 
       <!-- Modal Editar Tarefa -->
       <div
         id="dialog-editar-tarefa"
-        class="relative z-10 hidden"
+        class="relative z-10 rounded-lg hidden"
         aria-labelledby="modal-title"
         role="dialog"
         aria-modal="true"
+        data-id=""
       >
-        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+        <div class="fixed inset-0 z-10 w-screen rounded-lg">
           <div
-            class="flex min-h-full items-end border justify-center p-4 text-center sm:items-center sm:p-0"
+            class="flex min-h-full rounded-lg items-end border justify-center p-4 text-center sm:items-center sm:p-0"
           >
             <div
-              class="relative transform overflow-hidden border rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg"
+              class="relative transform border rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg"
             >
-              <form id="formulario-editar-tarefa">
+              <form id="formulario-editar-tarefa" class="rounded-lg">
                 <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-                  <div class="sm:flex sm:items-start">
-                    <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                  <div class="sm:flex sm:items-start rounded-lg">
+                    <div class="mt-3 text-center sm:mt-0 sm:text-left">
                       <h3
                         class="text-base font-semibold leading-6 text-gray-900"
                         id="modal-title"
                       >
                         Editar Tarefa
                       </h3>
-                      <div class="mt-2">
+                      <div class="mt-2 mb-4">
                         <p class="text-sm text-gray-500">
                           Faça alterações em sua tarefa aqui. Clique em salvar
                           quando terminar.
@@ -284,7 +298,7 @@
                         <div class="flex items-center gap-3">
                           <label
                             for="campo-editar-descricao-tarefa"
-                            class="text-sm font-bold font-medium text-gray-700 text-end w-20"
+                            class="text-sm font-medium text-gray-700 text-end w-20"
                           >
                             Tarefa
                           </label>
@@ -294,44 +308,247 @@
                             id="campo-editar-descricao-tarefa"
                             placeholder="Descrição da Tarefa"
                             value=""
-                            class="flex-1"
+                            class="flex-1 text-sm"
                           />
                         </div>
                         <div class="flex items-center gap-3">
                           <label
-                            for="campo-editar-categoria-tarefa"
-                            class="text-sm font-bold font-medium text-gray-700 text-end w-20"
+                            for="campo-selecionar-categoria-tarefa"
+                            class="text-sm font-medium text-gray-700 text-end w-20"
                           >
                             Categoria
                           </label>
-                          <input
+                          <select
                             type="text"
-                            name="campo-editar-categoria-tarefa"
-                            id="campo-editar-categoria-tarefa"
-                            placeholder="Categoria da Tarefa"
-                            value=""
-                            class="flex-1"
-                          />
+                            name="campo-selecionar-categoria-tarefa"
+                            id="campo-selecionar-categoria-tarefa"
+                            class="flex-1 text-sm"
+                          ></select>
+                          <div class="flex justify-end">
+                            <div
+                              id="popover-categoria"
+                              class="w-[216px] mt-10 absolute rounded-md border bg-white shadow-md hidden text-sm font-medium"
+                            >
+                              <div
+                                class="popover-header font-semibold border-b-[1px] border-gray-100 p-3 text-blue-950"
+                              >
+                                Opções
+                              </div>
+                              <div class="popover-body p-1">
+                                <ul class="flex flex-col gap-2">
+                                  <li
+                                    class="flex gap-2 items-center hover:bg-gray-100 rounded-md"
+                                  >
+                                    <button
+                                      type="button"
+                                      id="botao-adicionar-categoria"
+                                      class="w-full flex items-center gap-2 p-2"
+                                    >
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 16 16"
+                                        fill="none"
+                                      >
+                                        <path
+                                          d="M8 3.33356V12.6669"
+                                          stroke="#334155"
+                                          stroke-width="2"
+                                          stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                        />
+                                        <path
+                                          d="M3.33337 8.00024H12.6667"
+                                          stroke="#172554"
+                                          stroke-width="2"
+                                          stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                        />
+                                      </svg>
+                                      <span>Adicionar categoria</span>
+                                    </button>
+                                  </li>
+                                  <li
+                                    class="flex gap-2 items-center hover:bg-gray-100 rounded-md"
+                                  >
+                                    <button
+                                      type="button"
+                                      id="botao-editar-categoria"
+                                      class="w-full flex items-center gap-2 p-2"
+                                    >
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 16 16"
+                                        fill="none"
+                                      >
+                                        <g clip-path="url(#clip0_85_1221)">
+                                          <path
+                                            d="M11.3334 2.00022C11.5085 1.82513 11.7163 1.68623 11.9451 1.59147C12.1739 1.49671 12.4191 1.44794 12.6667 1.44794C12.9143 1.44794 13.1595 1.49671 13.3883 1.59147C13.6171 1.68623 13.8249 1.82513 14 2.00022C14.1751 2.17532 14.314 2.38319 14.4088 2.61196C14.5036 2.84073 14.5523 3.08593 14.5523 3.33355C14.5523 3.58118 14.5036 3.82638 14.4088 4.05515C14.314 4.28392 14.1751 4.49179 14 4.66689L5.00004 13.6669L1.33337 14.6669L2.33337 11.0002L11.3334 2.00022Z"
+                                            stroke="#334155"
+                                            stroke-width="2"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                          />
+                                        </g>
+                                        <defs>
+                                          <clipPath id="clip0_85_1221">
+                                            <rect
+                                              width="16"
+                                              height="16"
+                                              fill="white"
+                                              transform="translate(0 0.000244141)"
+                                            />
+                                          </clipPath>
+                                        </defs>
+                                      </svg>
+                                      <span>Editar categoria</span>
+                                    </button>
+                                  </li>
+                                  <li
+                                    class="flex gap-2 items-center hover:bg-gray-100 rounded-md"
+                                  >
+                                    <button
+                                      type="button"
+                                      id="botao-excluir-categoria"
+                                      class="w-full flex items-center gap-2 p-2"
+                                    >
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 16 16"
+                                        fill="none"
+                                      >
+                                        <path
+                                          d="M13.3334 3.33356H6.00004L1.33337 8.00022L6.00004 12.6669H13.3334C13.687 12.6669 14.0261 12.5264 14.2762 12.2764C14.5262 12.0263 14.6667 11.6872 14.6667 11.3336V4.66689C14.6667 4.31327 14.5262 3.97413 14.2762 3.72408C14.0261 3.47403 13.687 3.33356 13.3334 3.33356Z"
+                                          stroke="#334155"
+                                          stroke-width="2"
+                                          stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                        />
+                                        <path
+                                          d="M12 6.00024L8 10.0002"
+                                          stroke="#334155"
+                                          stroke-width="2"
+                                          stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                        />
+                                        <path
+                                          d="M8 6.00024L12 10.0002"
+                                          stroke="#172554"
+                                          stroke-width="2"
+                                          stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                        />
+                                      </svg>
+                                      <span>Excluir categoria</span>
+                                    </button>
+                                  </li>
+                                </ul>
+                              </div>
+                              <div
+                                class="popover-footer border-t-[1px] border-gray-100 p-1 text-blue-950"
+                              >
+                                <ul class="flex flex-col gap-2">
+                                  <li
+                                    class="flex gap-2 items-center hover:bg-gray-100 rounded-md"
+                                  >
+                                    <button
+                                      id="botao-fechar-popover-categoria"
+                                      class="w-full flex items-center gap-2 p-2"
+                                    >
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 16 16"
+                                        fill="none"
+                                      >
+                                        <path
+                                          d="M6 14.0002H3.33333C2.97971 14.0002 2.64057 13.8598 2.39052 13.6097C2.14048 13.3597 2 13.0205 2 12.6669V3.33358C2 2.97996 2.14048 2.64082 2.39052 2.39077C2.64057 2.14072 2.97971 2.00024 3.33333 2.00024H6"
+                                          stroke="#334155"
+                                          stroke-width="2"
+                                          stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                        />
+                                        <path
+                                          d="M10.6666 11.3336L14 8.00026L10.6666 4.66693"
+                                          stroke="#334155"
+                                          stroke-width="2"
+                                          stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                        />
+                                        <path
+                                          d="M14 8.00024H6"
+                                          stroke="#172554"
+                                          stroke-width="2"
+                                          stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                        />
+                                      </svg>
+                                      <span>Fechar</span>
+                                    </button>
+                                  </li>
+                                </ul>
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              id="botao-popover-categoria"
+                              class="border-[1px] border-slate-300 rounded-md text-white p-2 hover:bg-gray-100"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                viewBox="0 0 16 16"
+                                fill="none"
+                              >
+                                <path
+                                  d="M8.00004 8.66665C8.36823 8.66665 8.66671 8.36817 8.66671 7.99998C8.66671 7.63179 8.36823 7.33331 8.00004 7.33331C7.63185 7.33331 7.33337 7.63179 7.33337 7.99998C7.33337 8.36817 7.63185 8.66665 8.00004 8.66665Z"
+                                  stroke="#172554"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                />
+                                <path
+                                  d="M8.00004 4.00002C8.36823 4.00002 8.66671 3.70154 8.66671 3.33335C8.66671 2.96516 8.36823 2.66669 8.00004 2.66669C7.63185 2.66669 7.33337 2.96516 7.33337 3.33335C7.33337 3.70154 7.63185 4.00002 8.00004 4.00002Z"
+                                  stroke="#172554"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                />
+                                <path
+                                  d="M8.00004 13.3333C8.36823 13.3333 8.66671 13.0349 8.66671 12.6667C8.66671 12.2985 8.36823 12 8.00004 12C7.63185 12 7.33337 12.2985 7.33337 12.6667C7.33337 13.0349 7.63185 13.3333 8.00004 13.3333Z"
+                                  stroke="#172554"
+                                  stroke-width="2"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                />
+                              </svg>
+                            </button>
+                          </div>
                         </div>
                         <div class="flex items-center gap-3">
                           <label
-                            for="campo-editar-categoria-tarefa"
-                            class="text-sm font-bold font-medium text-gray-700 text-end w-20"
+                            for="campo-editar-data-tarefa"
+                            class="text-sm font-medium text-gray-700 text-end w-20"
                           >
                             Data
                           </label>
                           <input
                             type="date"
-                            name="campo-editar-categoria-tarefa"
-                            id="campo-editar-categoria-tarefa"
+                            name="campo-editar-data-tarefa"
+                            id="campo-editar-data-tarefa"
                             placeholder="Data de conclusão pretendida"
                             value=""
-                            class="flex-1"
+                            class="flex-1 text-sm"
                           />
                         </div>
                       </div>
-                      
-                      
                     </div>
                   </div>
                 </div>
@@ -346,7 +563,7 @@
                     Salvar
                   </button>
                   <button
-                    id="botao-cancelar-edicao"
+                    id="botao-cancelar-editar-tarefa"
                     type="button"
                     class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
                   >
@@ -359,6 +576,7 @@
         </div>
       </div>
 
+      <!-- Modal Excluir Tarefa -->
       <div
         id="dialog-excluir-tarefa"
         class="relative z-10 hidden"
@@ -409,6 +627,248 @@
                   Cancelar
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Adicionar Categoria -->
+      <div
+        id="dialog-adicionar-categoria"
+        class="relative z-10 rounded-lg hidden"
+        aria-labelledby="modal-title"
+        role="dialog"
+        aria-modal="true"
+      >
+        <div class="fixed inset-0 z-10 w-screen rounded-lg overflow-hidden">
+          <div
+            class="flex min-h-full overflow-hidden rounded-lg items-end border justify-center p-4 text-center sm:items-center sm:p-0"
+          >
+            <div
+              class="relative overflow-hidden transform border rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg"
+            >
+              <form id="formulario-adicionar-categoria" class="rounded-lg">
+                <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                  <div class="sm:flex sm:items-start rounded-lg">
+                    <div class="mt-3 text-center sm:mt-0 sm:text-left">
+                      <h3
+                        class="text-base font-semibold leading-6 text-gray-900"
+                        id="modal-title"
+                      >
+                        Adicionar Categoria
+                      </h3>
+                      <div class="mt-2 mb-4">
+                        <p class="text-sm text-gray-500">
+                          Adicione uma nova categoria aqui, a cor da categoria
+                          será gerada automaticamente. Clique em salvar quando
+                          terminar.
+                        </p>
+                      </div>
+                      <div class="flex flex-col gap-2">
+                        <div class="flex items-center gap-3">
+                          <label
+                            for="campo-adicionar-nome-categoria"
+                            class="text-sm font-medium text-gray-700 text-end w-20"
+                          >
+                            Categoria
+                          </label>
+                          <input
+                            type="text"
+                            name="campo-adicionar-nome-categoria"
+                            id="campo-adicionar-nome-categoria"
+                            placeholder="Nome da Categoria"
+                            value=""
+                            class="flex-1 text-sm"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6"
+                >
+                  <button
+                    id="botao-acao-adicionar-categoria"
+                    type="submit"
+                    class="inline-flex w-full justify-center rounded-md bg-blue-900 px-3 py-2 text-sm font-semibold text-white shadow-sm sm:ml-3 sm:w-auto"
+                  >
+                    Salvar
+                  </button>
+                  <button
+                    id="botao-cancelar-adicionar-categoria"
+                    type="button"
+                    class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Editar Categoria -->
+      <div
+        id="dialog-editar-categoria"
+        class="relative z-10 rounded-lg hidden"
+        aria-labelledby="modal-title"
+        role="dialog"
+        aria-modal="true"
+      >
+        <div class="fixed inset-0 z-10 w-screen rounded-lg overflow-hidden">
+          <div
+            class="flex min-h-full overflow-hidden rounded-lg items-end border justify-center p-4 text-center sm:items-center sm:p-0"
+          >
+            <div
+              class="relative overflow-hidden transform border rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg"
+            >
+              <form id="formulario-editar-categoria" class="rounded-lg">
+                <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                  <div class="sm:flex sm:items-start rounded-lg">
+                    <div class="mt-3 text-center sm:mt-0 sm:text-left">
+                      <h3
+                        class="text-base font-semibold leading-6 text-gray-900"
+                        id="modal-title"
+                      >
+                        Editar Categoria
+                      </h3>
+                      <div class="mt-2 mb-4">
+                        <p class="text-sm text-gray-500">
+                          Faça alterações em sua categoria aqui. Clique em
+                          salvar quando terminar.
+                        </p>
+                      </div>
+                      <div class="flex flex-col gap-2">
+                        <div class="flex items-center gap-3">
+                          <label
+                            for="campo-selecionar-editar-categoria-tarefa"
+                            class="text-sm font-medium text-gray-700 text-end w-20"
+                          >
+                            Categoria
+                          </label>
+                          <select
+                            type="text"
+                            name="campo-selecionar-editar-categoria-tarefa"
+                            id="campo-selecionar-editar-categoria-tarefa"
+                            class="flex-1 text-sm"
+                            value=""
+                          ></select>
+                        </div>
+                        <div class="flex items-center gap-3">
+                          <label
+                            for="campo-editar-nome-categoria"
+                            class="text-sm font-medium text-gray-700 text-end w-20"
+                          >
+                            Novo nome
+                          </label>
+                          <input
+                            type="text"
+                            name="campo-editar-nome-categoria"
+                            id="campo-editar-nome-categoria"
+                            placeholder="Nome da Categoria"
+                            value=""
+                            class="flex-1 text-sm"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6"
+                >
+                  <button
+                    id="botao-acao-editar-categoria"
+                    type="submit"
+                    class="inline-flex w-full justify-center rounded-md bg-blue-900 px-3 py-2 text-sm font-semibold text-white shadow-sm sm:ml-3 sm:w-auto"
+                  >
+                    Salvar
+                  </button>
+                  <button
+                    id="botao-cancelar-editar-categoria"
+                    type="button"
+                    class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Excluir Categoria -->
+      <div
+        id="dialog-excluir-categoria"
+        class="relative z-10 rounded-lg hidden"
+        aria-labelledby="modal-title"
+        role="dialog"
+        aria-modal="true"
+      >
+        <div class="fixed inset-0 z-10 w-screen rounded-lg overflow-hidden">
+          <div
+            class="flex min-h-full overflow-hidden rounded-lg items-end border justify-center p-4 text-center sm:items-center sm:p-0"
+          >
+            <div
+              class="relative overflow-hidden transform border rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg"
+            >
+              <form id="formulario-excluir-categoria" class="rounded-lg">
+                <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                  <div class="sm:flex sm:items-start rounded-lg">
+                    <div class="mt-3 text-center sm:mt-0 sm:text-left">
+                      <h3
+                        class="text-base font-semibold leading-6 text-gray-900"
+                        id="modal-title"
+                      >
+                        Editar Categoria
+                      </h3>
+                      <div class="mt-2 mb-4">
+                        <p class="text-sm text-gray-500">
+                          Esta ação não pode ser revertida. A categoria será
+                          excluída permanentemente.
+                        </p>
+                      </div>
+                      <div class="flex flex-col gap-2">
+                        <div class="flex items-center gap-3">
+                          <label
+                            for="campo-selecionar-excluir-categoria-tarefa"
+                            class="text-sm font-medium text-gray-700 text-end w-20"
+                          >
+                            Categoria
+                          </label>
+                          <select
+                            type="text"
+                            name="campo-selecionar-excluir-categoria-tarefa"
+                            id="campo-selecionar-excluir-categoria-tarefa"
+                            class="flex-1 text-sm"
+                          ></select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6"
+                >
+                  <button
+                    id="botao-acao-excluir-categoria"
+                    type="submit"
+                    class="inline-flex w-full justify-center rounded-md bg-red-900 px-3 py-2 text-sm font-semibold text-white shadow-sm sm:ml-3 sm:w-auto"
+                  >
+                    Excluir
+                  </button>
+                  <button
+                    id="botao-cancelar-excluir-categoria"
+                    type="button"
+                    class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
