@@ -4,31 +4,15 @@ class Tarefa {
     public id: number;
     public descricao: string;
     public status: string;
-    public data: Date | null;
-    public categoria: CategoriaTarefa | null;
+    public data: string | null;
+    public categoria: number | null;
 
     constructor(id: number, descricao: string, status: string) {
         this.id = id;
         this.descricao = descricao;
         this.status = status;
         this.data = null;
-        this.categoria = null;
-    }
-
-    public getId(): number {
-        return this.id;
-    }
-
-    public getDescricao(): string {
-        return this.descricao;
-    }
-
-    public getStatus(): string {
-        return this.status;
-    }
-
-    public getData(): Date | null {
-        return this.data;
+        this.categoria = 0;
     }
 }
 
@@ -45,13 +29,13 @@ class GerenciadorTarefa {
             if (!descricao) {
                 throw new Error('Descrição da tarefa não informada!');
             }
-    
+
             const idTarefa = this.obterProximoId();
             const novaTarefa = new Tarefa(idTarefa, descricao, this.obterStatusDaTarefa());
-    
+
             this.tarefas.push(novaTarefa);
             this.atualizarTarefasNoLocalStorage();
-    
+
             return {
                 resultado: 'sucesso',
                 titulo: 'Tarefa criada com sucesso!',
@@ -64,14 +48,43 @@ class GerenciadorTarefa {
             };
         }
     }
-    
+
     private obterProximoId(): number {
-        const ultimoId = this.tarefas.length > 0 ? this.tarefas[this.tarefas.length - 1].getId() : 0;
-        return ultimoId + 1;
+        const ultimoId = this.tarefas.length > 0 ? this.tarefas[this.tarefas.length - 1].id : 0;
+        const proximoId = ultimoId + 1;
+        return proximoId;
     }
 
-    public editarTarefa(idTarefa: number, novaDescricao: string, novoStatus: string, novaCategoria: string): void {
-        // Implementar lógica para editar uma tarefa existente
+    public editarTarefa(idTarefa: number, novaDescricao: string, novaCategoria: number, novaData: string): { resultado: string, titulo: string, mensagem?: string } {
+        try {
+            const tarefa = this.encontrarTarefaPeloId(idTarefa);
+            if (!tarefa) {
+                throw new Error(`Tarefa ${idTarefa} não encontrada.`);
+            }
+
+            if (!novaDescricao) {
+                throw new Error('Descrição da tarefa não informada.');
+            }
+
+            tarefa.descricao = novaDescricao;
+            tarefa.categoria = novaCategoria;
+            tarefa.data = novaData;
+
+            const indiceParaAtualizar = this.tarefas.findIndex(tarefa => tarefa.id === idTarefa);
+            this.tarefas[indiceParaAtualizar] = tarefa;
+            this.atualizarTarefasNoLocalStorage();
+
+            return {
+                resultado: 'sucesso',
+                titulo: 'Tarefa editada com sucesso!',
+            };
+        } catch (error) {
+            return {
+                resultado: 'erro',
+                titulo: 'Não foi possível editar a tarefa!',
+                mensagem: (error as Error).message
+            };
+        }
     }
 
     public excluirTarefa(idTarefa: number): { resultado: string, titulo: string, mensagem?: string } {
@@ -98,9 +111,6 @@ class GerenciadorTarefa {
         }
     }
 
-    public definirStatusTarefa(idTarefa: number, status: string): void {
-    }
-
     public trocarStatusTarefa(idTarefa: number): void {
         const tarefa = this.encontrarTarefaPeloId(idTarefa);
 
@@ -123,11 +133,9 @@ class GerenciadorTarefa {
         return this.tarefas.find(tarefa => tarefa.id === idTarefa);
     }
 
-
     private atualizarTarefasNoLocalStorage(): void {
         localStorage.setItem('tarefas', JSON.stringify(this.tarefas));
     }
-
 
     private obterStatusDaTarefa(): string {
         const queryString = window.location.search;
@@ -144,40 +152,93 @@ class GerenciadorTarefa {
                 return 'A fazer';
         }
     }
+
+    public atualizarTarefaAoArrastar(idTarefa: number, idTarefaAnterior: number, novoStatus: string): void {
+        const indiceTarefa = this.tarefas.findIndex(tarefa => tarefa.id === idTarefa);
+        const indiceTarefaAnterior = this.tarefas.findIndex(tarefa => tarefa.id === idTarefaAnterior);
+        const tarefa = this.tarefas[indiceTarefa];
+
+        if (indiceTarefa !== -1 && indiceTarefaAnterior !== -1) {
+            const tarefaMovida = this.tarefas.splice(indiceTarefa, 1)[0];
+            this.tarefas.splice(indiceTarefaAnterior, 0, tarefaMovida);
+        }
+
+        tarefa.status = novoStatus;
+        this.atualizarTarefasNoLocalStorage();
+    }
 }
 
 class QuadroTarefa {
-    private aFazer: Tarefa[];
-    private emAndamento: Tarefa[];
-    private concluida: Tarefa[];
+    private gerenciadorTarefa: GerenciadorTarefa;
+    private colunas: NodeListOf<HTMLDivElement> | null = null;
 
     constructor() {
-        this.aFazer = [];
-        this.emAndamento = [];
-        this.concluida = [];
+        this.gerenciadorTarefa = new GerenciadorTarefa();
+        this.colunas = document.querySelectorAll('.coluna');
+
+        this.moverTarefa();
     }
 
-    public moverTarefa(tarefa: Tarefa, deStatus: string, paraStatus: string): void {
-        // Implementar lógica para mover uma tarefa entre status
+    private pegarNovaPosicao(coluna: HTMLDivElement, posicaoY: number) {
+        const tarefas = coluna.querySelectorAll(".card-tarefa:not(.arrastando)");
+        let resultado;
+
+        for (let tarefa of tarefas) {
+            const caixa = tarefa.getBoundingClientRect();
+            const centroCaixaY = caixa.y + caixa.height / 2;
+
+            if (posicaoY >= centroCaixaY) {
+                resultado = tarefa;
+            }
+        }
+
+        return resultado;
     }
 
-    private definirStatusTarefa(tarefa: Tarefa, status: string): void {
-        // Implementar lógica para definir o status de uma tarefa
-    }
+    public moverTarefa(): void {
+        document.addEventListener("dragstart", (evento: DragEvent) => {
+            if (evento.target instanceof HTMLElement) {
+                evento.target.classList.add("arrastando");
+            }
+        });
 
-    private removerTarefaDoStatus(tarefa: Tarefa): void {
-        // Implementar lógica para remover uma tarefa de um status específico
-    }
+        document.addEventListener("dragend", (evento: DragEvent) => {
+            if (evento.target instanceof HTMLElement) {
+                const tarefa = evento.target;
+                evento.target.classList.remove("arrastando");
 
-    private salvarQuadroTarefaNoLocalStorage(): void {
-        // Implementar lógica para salvar o quadro de tarefas no armazenamento local
+                const novoStatus =
+                    tarefa.parentElement?.id === 'tarefas-a-fazer' ? 'A Fazer' :
+                        tarefa.parentElement?.id === 'tarefas-em-andamento' ? 'Em Andamento' :
+                            tarefa.parentElement?.id === 'tarefas-concluidas' ? 'Concluída' :
+                                'Desconhecido';
+
+                const idTarefa = Number(tarefa.id.split('-')[1]);
+                const idTarefaAnterior = Number(tarefa.previousElementSibling?.id.split('-')[1]);
+
+                this.gerenciadorTarefa.atualizarTarefaAoArrastar(idTarefa, idTarefaAnterior, novoStatus);
+            }
+        });
+
+        this.colunas?.forEach((item) => {
+            item.addEventListener("dragover", (evento: DragEvent) => {
+                const arrastando = document.querySelector(".arrastando");
+                const aplicarDepois = this.pegarNovaPosicao(item, evento.clientY);
+
+                if (aplicarDepois) {
+                    aplicarDepois.insertAdjacentElement("afterend", arrastando!);
+                } else {
+                    item.prepend(arrastando!);
+                }
+            });
+        })
     }
 }
 
 class CategoriaTarefa {
-    private id: number;
-    private nome: string;
-    private cor: string;
+    public id: number;
+    public nome: string;
+    public cor: string;
 
     constructor(id: number, nome: string, cor: string) {
         this.id = id;
@@ -191,75 +252,268 @@ class GerenciadorCategoria {
     private coresPredefinidas: { cor: string; utilizada: boolean }[];
 
     constructor() {
-        this.categorias = [];
-        this.coresPredefinidas = [];
+        const categoriasSalvas = localStorage.getItem('categorias');
+        const coresSalvas = localStorage.getItem('cores');
+
+        this.categorias = categoriasSalvas ? JSON.parse(categoriasSalvas) : [];
+
+        if (coresSalvas) {
+            this.coresPredefinidas = JSON.parse(coresSalvas);
+        } else {
+            this.coresPredefinidas = [
+                {
+                    cor: "red",
+                    utilizada: false
+                },
+                {
+                    cor: "orange",
+                    utilizada: false
+                },
+                {
+                    cor: "amber",
+                    utilizada: false
+                },
+                {
+                    cor: "yellow",
+                    utilizada: false
+                },
+                {
+                    cor: "lime",
+                    utilizada: false
+                },
+                {
+                    cor: "green",
+                    utilizada: false
+                },
+                {
+                    cor: "emerald",
+                    utilizada: false
+                },
+                {
+                    cor: "teal",
+                    utilizada: false
+                },
+                {
+                    cor: "cyan",
+                    utilizada: false
+                },
+                {
+                    cor: "sky",
+                    utilizada: false
+                },
+                {
+                    cor: "blue",
+                    utilizada: false
+                },
+                {
+                    cor: "indigo",
+                    utilizada: false
+                },
+                {
+                    cor: "violet",
+                    utilizada: false
+                },
+                {
+                    cor: "purple",
+                    utilizada: false
+                },
+                {
+                    cor: "fuchsia",
+                    utilizada: false
+                },
+                {
+                    cor: "pink",
+                    utilizada: false
+                },
+                {
+                    cor: "rose",
+                    utilizada: false
+                }
+            ];
+            this.atualizarCoresNoLocalStorage();
+        }
     }
 
-    public criarCategoria(nome: string): void {
-        // Implementar lógica para criar uma nova categoria
+    public criarCategoria(nome: string): { resultado: string, titulo: string, mensagem?: string } {
+        try {
+            if (!nome) {
+                throw new Error('Nome da categoria não informado!');
+            }
+
+            const idCategoria = this.obterProximoId();
+            const corDisponivel = this.obterCorDisponivel();
+
+            if (!corDisponivel) {
+                throw new Error('Você atingiu o limite de categorias.');
+            }
+
+            const novaCategoria = new CategoriaTarefa(idCategoria, nome, corDisponivel);
+
+            this.categorias.push(novaCategoria);
+            this.atualizarCategoriasNoLocalStorage();
+            this.atualizarStatusCor(corDisponivel);
+
+            return {
+                resultado: 'sucesso',
+                titulo: 'Categoria criada com sucesso!',
+            };
+        } catch (error) {
+            return {
+                resultado: 'erro',
+                titulo: 'Não foi possível criar a categoria!',
+                mensagem: (error as Error).message
+            };
+        }
     }
 
-    public editarCategoria(idCategoria: number, novoNome: string): void {
-        // Implementar lógica para editar uma categoria existente
+    public obterCategorias(): CategoriaTarefa[] {
+        return this.categorias;
     }
 
-    public excluirCategoria(idCategoria: number): void {
-        // Implementar lógica para excluir uma categoria
+    public editarCategoria(idCategoria: number, novoNome: string): { resultado: string, titulo: string, mensagem?: string } {
+        try {
+            const categoria = this.encontrarCategoriaPeloId(idCategoria);
+            if (!categoria) {
+                throw new Error(`Categoria ${idCategoria} não encontrada.`);
+            }
+
+            if (!novoNome) {
+                throw new Error('Nome da categoria não informado.');
+            }
+
+            categoria.nome = novoNome;
+
+            console.log(categoria);
+
+            const indiceParaAtualizar = this.categorias.findIndex(categoria => categoria.id === idCategoria);
+            this.categorias[indiceParaAtualizar] = categoria;
+            this.atualizarCategoriasNoLocalStorage();
+
+            return {
+                resultado: 'sucesso',
+                titulo: 'Categoria editada com sucesso!',
+            };
+        } catch (error) {
+            return {
+                resultado: 'erro',
+                titulo: 'Não foi possível editar a categoria!',
+                mensagem: (error as Error).message
+            };
+        }
+    }
+
+    public excluirCategoria(idCategoria: number): { resultado: string, titulo: string, mensagem?: string } {
+        try {
+            const indiceParaRemover = this.categorias.findIndex(categoria => categoria.id === idCategoria);
+            const cor = this.categorias[indiceParaRemover].cor;
+
+            if (indiceParaRemover === -1) {
+                throw new Error(`Categoria ${idCategoria} não encontrada!`);
+            }
+
+
+            this.categorias.splice(indiceParaRemover, 1);
+            this.atualizarCategoriasNoLocalStorage();
+
+            this.atualizarStatusCor(cor);
+
+            // remover categoria de tarefas com a categoria
+            const tarefas = new GerenciadorTarefa().obterTarefas();
+            const tarefasComCategoria = tarefas.filter(tarefa => tarefa.categoria === idCategoria);
+
+            tarefasComCategoria.forEach(tarefa => {
+                tarefa.categoria = null;
+            })
+
+            localStorage.setItem('tarefas', JSON.stringify(tarefas));
+
+            return {
+                resultado: 'sucesso',
+                titulo: 'Categoria excluída com sucesso!',
+            };
+        } catch (error) {
+            return {
+                resultado: 'erro',
+                titulo: 'Não foi possível excluir a categoria!',
+                mensagem: (error as Error).message
+            };
+        }
+    }
+
+    private obterProximoId(): number {
+        const ultimoId = this.categorias.length > 0 ? this.categorias[this.categorias.length - 1].id : 0;
+        const proximoId = ultimoId + 1;
+        return proximoId;
     }
 
     private encontrarCategoriaPeloId(idCategoria: number): CategoriaTarefa | undefined {
-        // Implementar lógica para encontrar uma categoria pelo ID
-        return undefined;
+        return this.categorias.find(categoria => categoria.id === idCategoria);
     }
 
-    private salvarCategoriaNoLocalStorage(): void {
-        // Implementar lógica para salvar as categorias no armazenamento local
+    private atualizarCategoriasNoLocalStorage(): void {
+        localStorage.setItem('categorias', JSON.stringify(this.categorias));
     }
 
-    private definirCorCategoria(): void {
-        // Implementar lógica para definir a cor de uma categoria
+    private atualizarCoresNoLocalStorage(): void {
+        localStorage.setItem('cores', JSON.stringify(this.coresPredefinidas));
     }
 
-    private inicializarCoresPredefinidas(): void {
-        // Implementar lógica para inicializar as cores predefinidas
+    private obterCorDisponivel(): string | null {
+        const coresDisponiveis = this.coresPredefinidas.filter(cor => cor.utilizada === false);
+
+        if (coresDisponiveis.length === 0) {
+            return null;
+        }
+
+        const indiceCor = Math.floor(Math.random() * coresDisponiveis.length);
+        const corDisponivel = coresDisponiveis[indiceCor];
+
+        return corDisponivel.cor;
     }
 
-    private corEstaSendoUsada(cor: string): boolean {
-        // Implementar lógica para verificar se a cor está sendo usada por alguma categoria
-        return false;
-    }
+    private atualizarStatusCor(cor: string): void {
+        const indiceCor = this.coresPredefinidas.findIndex(corPredefinida => corPredefinida.cor === cor);
 
-    private obterCorDisponivel(): string | undefined {
-        // Implementar lógica para obter uma cor disponível
-        return undefined;
+        this.coresPredefinidas[indiceCor].utilizada = true;
+        this.atualizarCoresNoLocalStorage();
     }
 }
 
 class InterfaceGrafica {
     private gerenciadorTarefa: GerenciadorTarefa;
-    private quadroTarefa: QuadroTarefa;
     private gerenciadorCategoria: GerenciadorCategoria;
 
     //Criação de Tarefa
-    private formularioAdicionarTarefa: HTMLFormElement | null;
+    private formularioAdicionarTarefa: HTMLFormElement
     private campoDescricaoTarefa: HTMLInputElement;
     private botoesAdicionarTarefaAFazer: NodeListOf<HTMLButtonElement> | null;
     private botoesAdicionarTarefaEmAndamento: NodeListOf<HTMLButtonElement> | null;
     private botoesAdicionarTarefaConcluida: NodeListOf<HTMLButtonElement> | null;
 
     // Colunas do quadro
-    private colunaTarefasAFazer: HTMLDivElement | null;
-    private colunaTarefasEmAndamento: HTMLDivElement | null;
-    private colunaTarefasConcluidas: HTMLDivElement | null;
+    private colunaTarefasAFazer: HTMLDivElement
+    private colunaTarefasEmAndamento: HTMLDivElement
+    private colunaTarefasConcluidas: HTMLDivElement
 
     // Toast
-    private toastSucesso: HTMLDivElement | null;
-    private toastErro: HTMLDivElement | null;
+    private toastSucesso: HTMLDivElement
+    private toastErro: HTMLDivElement
 
     //Popover
     private popoversTarefa: NodeListOf<HTMLElement> | null = null;
     private botoesPopoverTarefa: NodeListOf<HTMLElement> | null = null;
     private botoesFecharPopover: NodeListOf<HTMLElement> | null = null;
+
+    // Popover Categoria
+    private popoverCategoria: HTMLDivElement;
+    private botaoPopoverCategoria: HTMLButtonElement;
+    private botaoFecharPopoverCategoria: HTMLButtonElement;
+
+    // Categoria
+    private botaoAdicionarCategoria: HTMLButtonElement;
+    private botaoEditarCategoria: HTMLButtonElement;
+    private botaoExcluirCategoria: HTMLButtonElement;
+
 
     // Tarefa
     private botoesDefinirStatusConcluida: NodeListOf<HTMLButtonElement> | null = null;
@@ -267,16 +521,43 @@ class InterfaceGrafica {
     private botoesExcluirTarefa: NodeListOf<HTMLButtonElement> | null = null;
 
 
-    // Modal
-    private dialogEditarTarefa: HTMLDivElement | null = null;
-    private dialogExcluirTarefa: HTMLDivElement | null = null;
-    private botaoCancelarEditarTarefa: HTMLButtonElement | null = null;
-    private botaoAcaoExcluirTarefa: HTMLButtonElement | null = null;
-    private botaoCancelarExcluirTarefa: HTMLButtonElement | null = null;
+    // Modal Editar Tarefa
+    private dialogEditarTarefa: HTMLDivElement;
+    private botaoAcaoEditarTarefa: HTMLButtonElement;
+    private botaoCancelarEditarTarefa: HTMLButtonElement;
+
+    private formularioEditarTarefa: HTMLFormElement;
+    private campoEditarDescricaoTarefa: HTMLInputElement
+    private campoSelecionarCategoriaTarefa: HTMLSelectElement;
+    private campoEditarDataTarefa: HTMLInputElement;
+
+    // Modal Excluir Tarefa
+    private dialogExcluirTarefa: HTMLDivElement;
+    private botaoAcaoExcluirTarefa: HTMLButtonElement;
+    private botaoCancelarExcluirTarefa: HTMLButtonElement;
+
+    // Modal Categoria
+    private dialogAdicionarCategoria: HTMLDivElement;
+    private formularioAdicionarCategoria: HTMLFormElement;
+    private campoAdicionarNomeCategoria: HTMLInputElement;
+    private botaoAcaoAdicionarCategoria: HTMLButtonElement;
+    private botaoCancelarAdicionarCategoria: HTMLButtonElement;
+
+    private dialogEditarCategoria: HTMLDivElement;
+    private campoSelecionarEditarCategoria: HTMLSelectElement;
+    private formularioEditarCategoria: HTMLFormElement;
+    private campoEditarNomeCategoria: HTMLInputElement;
+    private botaoAcaoEditarCategoria: HTMLButtonElement;
+    private botaoCancelarEditarCategoria: HTMLButtonElement;
+
+    private dialogExcluirCategoria: HTMLDivElement;
+    private campoSelecionarExcluirCategoria: HTMLSelectElement;
+    private formularioExcluirCategoria: HTMLFormElement;
+    private botaoAcaoExcluirCategoria: HTMLButtonElement;
+    private botaoCancelarExcluirCategoria: HTMLButtonElement;
 
     constructor() {
         this.gerenciadorTarefa = new GerenciadorTarefa();
-        this.quadroTarefa = new QuadroTarefa();
         this.gerenciadorCategoria = new GerenciadorCategoria();
 
         this.formularioAdicionarTarefa = document.getElementById("formulario-adicionar-tarefa") as HTMLFormElement;
@@ -293,9 +574,43 @@ class InterfaceGrafica {
         this.toastSucesso = document.getElementById("toast-sucesso") as HTMLDivElement;
 
         this.dialogEditarTarefa = document.getElementById("dialog-editar-tarefa") as HTMLDivElement;
+        this.botaoCancelarEditarTarefa = document.getElementById("botao-cancelar-editar-tarefa") as HTMLButtonElement;
+        this.botaoAcaoEditarTarefa = document.getElementById("botao-acao-editar-tarefa") as HTMLButtonElement;
+        this.formularioEditarTarefa = document.getElementById("formulario-editar-tarefa") as HTMLFormElement;
+        this.campoEditarDescricaoTarefa = document.getElementById("campo-editar-descricao-tarefa") as HTMLInputElement;
+        this.campoSelecionarCategoriaTarefa = document.getElementById("campo-selecionar-categoria-tarefa") as HTMLSelectElement;
+        this.campoEditarDataTarefa = document.getElementById("campo-editar-data-tarefa") as HTMLInputElement;
+
         this.dialogExcluirTarefa = document.getElementById("dialog-excluir-tarefa") as HTMLDivElement;
         this.botaoCancelarExcluirTarefa = document.getElementById("botao-cancelar-excluir-tarefa") as HTMLButtonElement;
         this.botaoAcaoExcluirTarefa = document.getElementById("botao-acao-excluir-tarefa") as HTMLButtonElement;
+
+        this.popoverCategoria = document.getElementById("popover-categoria") as HTMLDivElement;
+        this.botaoPopoverCategoria = document.getElementById("botao-popover-categoria") as HTMLButtonElement;
+        this.botaoFecharPopoverCategoria = document.getElementById("botao-fechar-popover-categoria") as HTMLButtonElement;
+
+        this.botaoAdicionarCategoria = document.getElementById("botao-adicionar-categoria") as HTMLButtonElement;
+        this.botaoEditarCategoria = document.getElementById("botao-editar-categoria") as HTMLButtonElement;
+        this.botaoExcluirCategoria = document.getElementById("botao-excluir-categoria") as HTMLButtonElement;
+
+        this.formularioAdicionarCategoria = document.getElementById("formulario-adicionar-categoria") as HTMLFormElement;
+        this.campoAdicionarNomeCategoria = document.getElementById("campo-adicionar-nome-categoria") as HTMLInputElement;
+        this.dialogAdicionarCategoria = document.getElementById("dialog-adicionar-categoria") as HTMLDivElement;
+        this.botaoCancelarAdicionarCategoria = document.getElementById("botao-cancelar-adicionar-categoria") as HTMLButtonElement;
+        this.botaoAcaoAdicionarCategoria = document.getElementById("botao-acao-adicionar-categoria") as HTMLButtonElement;
+
+        this.formularioEditarCategoria = document.getElementById("formulario-editar-categoria") as HTMLFormElement;
+        this.campoSelecionarEditarCategoria = document.getElementById("campo-selecionar-editar-categoria-tarefa") as HTMLSelectElement;
+        this.dialogEditarCategoria = document.getElementById("dialog-editar-categoria") as HTMLDivElement;
+        this.campoEditarNomeCategoria = document.getElementById("campo-editar-nome-categoria") as HTMLInputElement;
+        this.botaoCancelarEditarCategoria = document.getElementById("botao-cancelar-editar-categoria") as HTMLButtonElement;
+        this.botaoAcaoEditarCategoria = document.getElementById("botao-acao-editar-categoria") as HTMLButtonElement;
+
+        this.formularioExcluirCategoria = document.getElementById("formulario-excluir-categoria") as HTMLFormElement;
+        this.campoSelecionarExcluirCategoria = document.getElementById("campo-selecionar-excluir-categoria-tarefa") as HTMLSelectElement;
+        this.dialogExcluirCategoria = document.getElementById("dialog-excluir-categoria") as HTMLDivElement;
+        this.botaoAcaoExcluirCategoria = document.getElementById("botao-acao-excluir-categoria") as HTMLButtonElement;
+        this.botaoCancelarExcluirCategoria = document.getElementById("botao-cancelar-excluir-categoria") as HTMLButtonElement;
 
         this.exibirTarefas();
 
@@ -315,7 +630,7 @@ class InterfaceGrafica {
                 this.removerStatusTarefaDaURL();
                 this.campoDescricaoTarefa.focus();
                 this.campoDescricaoTarefa.placeholder = "Adicionar Tarefa A Fazer";
-                
+
             })
         })
 
@@ -337,7 +652,70 @@ class InterfaceGrafica {
             })
         })
 
+        this.formularioEditarTarefa?.addEventListener("submit", (evento) => {
+            evento.preventDefault();
 
+            const idTarefa = Number(this.dialogEditarTarefa.dataset.id);
+            const descricao = this.campoEditarDescricaoTarefa.value;
+            const categoria = Number(this.campoSelecionarCategoriaTarefa.value);
+            const data = this.campoEditarDataTarefa.value;
+
+            const resposta = this.gerenciadorTarefa.editarTarefa(idTarefa, descricao, categoria, data);
+            this.fecharDialogEditarTarefa();
+            this.exibirToast(resposta.resultado, resposta.titulo, resposta.mensagem);
+            this.exibirTarefas();
+            this.popoverCategoria.classList.add('hidden');
+        })
+
+        this.formularioAdicionarCategoria?.addEventListener("submit", (evento) => {
+            evento.preventDefault();
+            const nome = this.campoAdicionarNomeCategoria.value;
+            const resposta = this.gerenciadorCategoria.criarCategoria(nome);
+            this.campoAdicionarNomeCategoria.value = "";
+            this.exibirToast(resposta.resultado, resposta.titulo, resposta.mensagem);
+            this.fecharDialogAdicionarCategoria();
+
+            if (resposta.resultado === 'sucesso') {
+                this.atualizarOpcoesCategoria(this.campoSelecionarCategoriaTarefa);
+            }
+
+            this.popoverCategoria.classList.add('hidden');
+        })
+
+        this.formularioEditarCategoria?.addEventListener("submit", (evento) => {
+            evento.preventDefault();
+
+            const idCategoria = Number(this.campoSelecionarEditarCategoria.value);
+            const nome = this.campoEditarNomeCategoria.value;
+
+            const resposta = this.gerenciadorCategoria.editarCategoria(idCategoria, nome);
+            this.fecharDialogEditarCategoria();
+            this.exibirToast(resposta.resultado, resposta.titulo, resposta.mensagem);
+
+            if (resposta.resultado === 'sucesso') {
+                this.atualizarOpcoesCategoria(this.campoSelecionarCategoriaTarefa);
+                this.exibirTarefas();
+            }
+
+            this.popoverCategoria.classList.add('hidden');
+        })
+
+        this.formularioExcluirCategoria?.addEventListener("submit", (evento) => {
+            evento.preventDefault();
+
+            const idCategoria = Number(this.campoSelecionarExcluirCategoria.value);
+
+            const resposta = this.gerenciadorCategoria.excluirCategoria(idCategoria);
+            this.fecharDialogExcluirCategoria();
+            this.exibirToast(resposta.resultado, resposta.titulo, resposta.mensagem);
+
+            if (resposta.resultado === 'sucesso') {
+                this.atualizarOpcoesCategoria(this.campoSelecionarCategoriaTarefa);
+                this.exibirTarefas();
+            }
+
+            this.popoverCategoria.classList.add('hidden');
+        })
     }
 
     // Toast
@@ -358,7 +736,82 @@ class InterfaceGrafica {
         }
     }
 
-    // Tarefa
+    // Popover
+    private trocarExibicaoPopover(popover: HTMLDivElement): void {
+        console.log(popover);
+        console.log(popover?.classList);
+        if (popover?.classList.contains('hidden')) {
+            popover?.classList.remove('hidden');
+        } else {
+            popover?.classList.add('hidden');
+        }
+    }
+
+    // Popover Categoria
+    private ExibirPopoverCategoria() {
+        this.popoverCategoria.classList.remove('hidden');
+    }
+
+    private fecharPopoverCategoria() {
+        this.popoverCategoria.classList.add('hidden');
+    }
+
+    private fecharPopoverAoClicarFora(event: MouseEvent, botaoPopover: HTMLButtonElement, popover: HTMLDivElement) {
+        const targetNode = event.target as Node;
+
+        if (targetNode && !botaoPopover?.contains(targetNode) && !popover?.contains(targetNode)) {
+            popover?.classList.add('hidden');
+        }
+    }
+
+    private inicializarPopovers(): void {
+        this.popoversTarefa = document.querySelectorAll('[id^="popover-tarefa-"]');
+        this.botoesPopoverTarefa = document.querySelectorAll('[id^="botao-popover-tarefa-"]')
+        this.botoesFecharPopover = document.querySelectorAll('[id^="botao-fechar-popover-tarefa-"]');
+    }
+
+    private adicionarEventosPopover(): void {
+
+        if (this.popoversTarefa) {
+            this.botoesPopoverTarefa?.forEach((botao, indice) => {
+                botao.addEventListener("click", () => {
+                    const popover = this.popoversTarefa?.[indice];
+                    this.trocarExibicaoPopover(popover as HTMLDivElement)
+                })
+            })
+
+            this.botoesFecharPopover?.forEach((botao, indice) => {
+                botao.addEventListener("click", () => {
+                    const popover = this.popoversTarefa?.[indice];
+                    this.trocarExibicaoPopover(popover as HTMLDivElement)
+                })
+            })
+
+            document.addEventListener('click', (evento: MouseEvent) => {
+                this.botoesPopoverTarefa?.forEach((botao, indice) => {
+                    const popover = this.popoversTarefa?.[indice];
+                    this.fecharPopoverAoClicarFora(evento, botao as HTMLButtonElement, popover as HTMLDivElement);
+                })
+            })
+        }
+
+        if (this.popoverCategoria) {
+            this.botaoPopoverCategoria?.addEventListener("click", () => {
+                this.ExibirPopoverCategoria();
+            })
+
+            this.botaoFecharPopoverCategoria?.addEventListener("click", () => {
+                this.fecharPopoverCategoria();
+            })
+
+            document.addEventListener('click', (evento: MouseEvent) => {
+                this.fecharPopoverAoClicarFora(evento, this.botaoPopoverCategoria, this.popoverCategoria);
+            })
+        }
+
+    }
+
+    // Gerenciar Tarefa
     private exibirTarefas(): void {
         const tarefas = this.gerenciadorTarefa.obterTarefas();
 
@@ -391,13 +844,21 @@ class InterfaceGrafica {
         this.iniciarBotoesOpcoesTarefa();
         this.AdicionarEventosBotoesOpcoesTarefa();
 
-        this.AdicionarEventosBotoesAcaoTarefa();
+        this.AdicionarEventosBotoesAcaoDialog();
+
+        this.AdicionarEventosBotoesOpcoesCategoria();
     }
 
     private cardTarefa(tarefa: Tarefa): HTMLDivElement {
         const cardTarefa = document.createElement('div');
         cardTarefa.classList.add('card-tarefa');
         cardTarefa.id = `tarefa-${tarefa.id}`;
+        cardTarefa.setAttribute("draggable", "true");
+
+        const corCategoria = this.gerenciadorCategoria.obterCategorias().find(categoria => categoria.id === Number(tarefa.categoria))?.cor;
+        const nomeCategoria = this.gerenciadorCategoria.obterCategorias().find(categoria => categoria.id === Number(tarefa.categoria))?.nome;
+
+        cardTarefa.classList.add(corCategoria ? `border-${corCategoria}-400` : 'border-gray-200')
 
         const descricaoTarefa = document.createElement('p');
         descricaoTarefa.classList.add('descricao-tarefa');
@@ -494,12 +955,12 @@ class InterfaceGrafica {
                 stroke-linejoin="round"
               />
               </svg>
-              <span class="text-xs text-gray-500">${tarefa.data}</span>
+              <span class="text-xs ${this.verificarDataMenorQueAtual(tarefa.data) ? 'text-red-500' : 'text-gray-500'}">${this.converterDataParaTextoCorrido(tarefa.data)}</span>
             </div>
           </div>
 
           <!-- Categoria -->
-          <span class="text-xs text-gray-500 ${!tarefa.categoria ? 'hidden' : ''}">${tarefa.categoria}</span>
+          <span class="text-xs text-gray-500 ${!tarefa.categoria || tarefa.categoria === undefined ? 'hidden' : ''}">${nomeCategoria}</span>
 
           <!-- Popover -->
           <div class="flex justify-end">
@@ -634,7 +1095,7 @@ class InterfaceGrafica {
             </div>
             <button
                 id="botao-popover-tarefa-${tarefa.id}"
-                class="bg-gray-50 text-white p-2 border-[1px] border-gray-100 rounded-md hover:bg-gray-100"
+                class=" text-white p-2 border-[1px] ${corCategoria ? 'bg-' + corCategoria + '-50 ' + 'hover:bg-' + corCategoria + '-100 ' + 'border-' + corCategoria + '-100' : 'bg-gray-50 border-gray-100 hover:bg-gray-100'}  rounded-md "
             >
                 <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -691,53 +1152,6 @@ class InterfaceGrafica {
         window.history.replaceState({}, document.title, url.toString());
     }
 
-
-    // Popover
-    private trocarExibicaoPopover(popover: HTMLDivElement): void {
-        popover?.classList.toggle('hidden');
-    }
-
-    private fecharPopoverAoClicarFora(event: MouseEvent, botaoPopover: HTMLButtonElement, popover: HTMLDivElement) {
-        const targetNode = event.target as Node;
-
-        if (targetNode && !botaoPopover?.contains(targetNode) && !popover?.contains(targetNode)) {
-            popover?.classList.add('hidden');
-        }
-    }
-
-    private inicializarPopovers(): void {
-        this.popoversTarefa = document.querySelectorAll('[id^="popover-tarefa-"]');
-        this.botoesPopoverTarefa = document.querySelectorAll('[id^="botao-popover-tarefa-"]')
-        this.botoesFecharPopover = document.querySelectorAll('[id^="botao-fechar-popover-tarefa-"]');
-    }
-
-    private adicionarEventosPopover(): void {
-
-        if (this.popoversTarefa) {
-            this.botoesPopoverTarefa?.forEach((botao, indice) => {
-                botao.addEventListener("click", () => {
-                    const popover = this.popoversTarefa?.[indice];
-                    this.trocarExibicaoPopover(popover as HTMLDivElement)
-                })
-            })
-
-            this.botoesFecharPopover?.forEach((botao, indice) => {
-                botao.addEventListener("click", () => {
-                    const popover = this.popoversTarefa?.[indice];
-                    this.trocarExibicaoPopover(popover as HTMLDivElement)
-                })
-            })
-
-            document.addEventListener('click', (evento: MouseEvent) => {
-                this.botoesPopoverTarefa?.forEach((botao, indice) => {
-                    const popover = this.popoversTarefa?.[indice];
-                    this.fecharPopoverAoClicarFora(evento, botao as HTMLButtonElement, popover as HTMLDivElement);
-                })
-            })
-        }
-
-    }
-
     private iniciarBotoesDefinirStatusConcluida(): void {
         this.botoesDefinirStatusConcluida = document.querySelectorAll('[id^="botao-definir-status-concluida-"]');
     }
@@ -770,22 +1184,91 @@ class InterfaceGrafica {
                 })
             })
         }
+
+        if (this.botoesEditarTarefa) {
+            this.botoesEditarTarefa?.forEach((botao, indice) => {
+                botao.addEventListener("click", () => {
+                    const botaoEditarTarefa = this.botoesEditarTarefa?.[indice];
+                    const idTarefa = botaoEditarTarefa?.id.split('-').pop();
+                    this.exibirDialogEditarTarefa(Number(idTarefa));
+                })
+            })
+        }
     }
 
-    private AdicionarEventosBotoesAcaoTarefa(): void {
+    // Gerenciar Categoria
+    private AdicionarEventosBotoesOpcoesCategoria(): void {
+        if (this.botaoAdicionarCategoria) {
+            this.botaoAdicionarCategoria?.addEventListener("click", (evento: MouseEvent) => {
+                this.exibirDialogAdicionarCategoria();
+            })
+        }
+
+        if (this.botaoEditarCategoria) {
+            this.botaoEditarCategoria?.addEventListener("click", () => {
+                this.exibirDialogEditarCategoria();
+            })
+        }
+
+        if (this.botaoExcluirCategoria) {
+            this.botaoExcluirCategoria?.addEventListener("click", () => {
+                this.exibirDialogExcluirCategoria();
+            })
+        }
+    }
+
+    private atualizarOpcoesCategoria(campoSelecaoCategoria: HTMLSelectElement): void {
+        campoSelecaoCategoria.innerHTML = "";
+
+        const opcaoCategoria = document.createElement('option');
+        opcaoCategoria.value = "";
+        opcaoCategoria.innerText = "Nenhuma";
+        campoSelecaoCategoria.appendChild(opcaoCategoria);
+
+        this.gerenciadorCategoria.obterCategorias().forEach(categoria => {
+            const opcaoCategoria = document.createElement('option');
+            opcaoCategoria.value = categoria.id.toString();
+            opcaoCategoria.innerText = categoria.nome;
+            opcaoCategoria.classList.add(`font-medium`, `bg-${categoria.cor}-50`, 'py-4');
+            campoSelecaoCategoria.appendChild(opcaoCategoria);
+        })
+    }
+
+    // Dialog
+    private AdicionarEventosBotoesAcaoDialog(): void {
         if (this.botaoAcaoExcluirTarefa) {
             this.botaoAcaoExcluirTarefa?.removeEventListener("click", this.OnBotaoExcluirTarefaClick);
             this.botaoAcaoExcluirTarefa?.addEventListener("click", this.OnBotaoExcluirTarefaClick);
         }
 
         if (this.botaoCancelarExcluirTarefa) {
-            this.botaoCancelarExcluirTarefa?.removeEventListener("click", this.OnBotaoCancelarExcluirTarefaClick);
-            this.botaoCancelarExcluirTarefa?.addEventListener("click", this.OnBotaoCancelarExcluirTarefaClick);
+            this.botaoCancelarExcluirTarefa?.removeEventListener("click", this.onBotaoCancelarExcluirTarefaClick);
+            this.botaoCancelarExcluirTarefa?.addEventListener("click", this.onBotaoCancelarExcluirTarefaClick);
+        }
+
+        if (this.botaoCancelarEditarTarefa) {
+            this.botaoCancelarEditarTarefa?.removeEventListener("click", this.onBotaoCancelarEditarTarefaClick);
+            this.botaoCancelarEditarTarefa?.addEventListener("click", this.onBotaoCancelarEditarTarefaClick);
+        }
+
+        if (this.botaoCancelarAdicionarCategoria) {
+            this.botaoCancelarAdicionarCategoria?.removeEventListener("click", this.onBotaoCancelarAdicionarCategoriaClick);
+            this.botaoCancelarAdicionarCategoria?.addEventListener("click", this.onBotaoCancelarAdicionarCategoriaClick);
+        }
+
+        if (this.botaoCancelarEditarCategoria) {
+            this.botaoCancelarEditarCategoria?.removeEventListener("click", this.onBotaoCancelarEditarCategoriaClick);
+            this.botaoCancelarEditarCategoria?.addEventListener("click", this.onBotaoCancelarEditarCategoriaClick);
+        }
+
+        if (this.botaoCancelarExcluirCategoria) {
+            this.botaoCancelarExcluirCategoria?.removeEventListener("click", this.onBotaoCancelarExcluirCategoriaClick);
+            this.botaoCancelarExcluirCategoria?.addEventListener("click", this.onBotaoCancelarExcluirCategoriaClick);
         }
     }
 
+    // Dialog Excluir Tarefa
     private OnBotaoExcluirTarefaClick = (evento: MouseEvent): void => {
-        console.log(this.botaoAcaoExcluirTarefa?.id);
         const idTarefa = this.botaoAcaoExcluirTarefa?.id.split('-').pop();
         const resposta = this.gerenciadorTarefa.excluirTarefa(Number(idTarefa));
         this.exibirTarefas();
@@ -793,7 +1276,7 @@ class InterfaceGrafica {
         this.exibirToast(resposta.resultado, resposta.titulo, resposta.mensagem);
     }
 
-    private OnBotaoCancelarExcluirTarefaClick = (): void => {
+    private onBotaoCancelarExcluirTarefaClick = (): void => {
         this.fecharDialogExcluirTarefa();
     }
 
@@ -810,24 +1293,133 @@ class InterfaceGrafica {
             (this.botaoAcaoExcluirTarefa as HTMLElement).id = "botao-acao-excluir-tarefa";
         }
     }
+
+    // Dialog Editar Tarefa
+    private onBotaoCancelarEditarTarefaClick = (evento: MouseEvent): void => {
+        this.fecharDialogEditarTarefa();
+    }
+
+    private exibirDialogEditarTarefa(idTarefa: number): void {
+        this.atualizarOpcoesCategoria(this.campoSelecionarCategoriaTarefa);
+        this.dialogEditarTarefa?.classList.remove("hidden");
+        this.dialogEditarTarefa.dataset.id = idTarefa.toString();
+        const tarefa = this.gerenciadorTarefa.obterTarefas().find(tarefa => tarefa.id === idTarefa);
+
+
+        if (this.botaoAcaoEditarTarefa) {
+            (this.botaoAcaoEditarTarefa as HTMLElement).id = this.botaoAcaoEditarTarefa.id + "-" + idTarefa;
+        }
+
+        if (tarefa) {
+            this.campoEditarDescricaoTarefa.value = tarefa.descricao;
+            this.campoEditarDescricaoTarefa.focus();
+
+            if (tarefa.categoria) {
+                const opcoesCategoria = this.campoSelecionarCategoriaTarefa?.querySelectorAll('option');
+                if (opcoesCategoria) {
+                    opcoesCategoria.forEach((opcao: HTMLOptionElement) => {
+                        if (opcao.value === tarefa.categoria?.toString()) {
+                            console.log(opcao.value)
+                            opcao.selected = true;
+                        }
+                    });
+                }
+            }
+
+            if (tarefa.data) {
+                this.campoEditarDataTarefa.value = tarefa.data;
+            } else {
+                this.campoEditarDataTarefa.value = "";
+            }
+        }
+    }
+
+    private fecharDialogEditarTarefa(): void {
+        this.dialogEditarTarefa?.classList.add("hidden");
+        if (this.botaoAcaoEditarTarefa) {
+            (this.botaoAcaoEditarTarefa as HTMLElement).id = "botao-acao-editar-tarefa";
+        }
+    }
+
+    // Dialog Adicionar Categoria
+    private onBotaoCancelarAdicionarCategoriaClick = (evento: MouseEvent): void => {
+        this.fecharDialogAdicionarCategoria();
+    }
+
+    private exibirDialogAdicionarCategoria(): void {
+        this.dialogAdicionarCategoria?.classList.remove("hidden");
+    }
+
+    private fecharDialogAdicionarCategoria(): void {
+        this.dialogAdicionarCategoria?.classList.add("hidden");
+    }
+
+    // Dialog Editar Categoria
+    private onBotaoCancelarEditarCategoriaClick = (evento: MouseEvent): void => {
+        this.fecharDialogEditarCategoria();
+    }
+
+    private exibirDialogEditarCategoria(): void {
+        this.dialogEditarCategoria?.classList.remove("hidden");
+        this.atualizarOpcoesCategoria(this.campoSelecionarEditarCategoria);
+
+    }
+
+    private fecharDialogEditarCategoria(): void {
+        this.dialogEditarCategoria?.classList.add("hidden");
+    }
+
+    // Dialog Excluir Categoria
+    private onBotaoCancelarExcluirCategoriaClick = (evento: MouseEvent): void => {
+        this.fecharDialogExcluirCategoria();
+    }
+
+    private exibirDialogExcluirCategoria(): void {
+        this.dialogExcluirCategoria?.classList.remove("hidden");
+        this.atualizarOpcoesCategoria(this.campoSelecionarExcluirCategoria);
+    }
+
+    private fecharDialogExcluirCategoria(): void {
+        this.dialogExcluirCategoria?.classList.add("hidden");
+    }
+
+    private converterDataParaTextoCorrido(dataString: string | null): string {
+        if (!dataString) {
+            return "";
+        }
+
+        const data = new Date(dataString);
+
+        // Array com os nomes dos meses em português
+        const meses = [
+            "janeiro", "fevereiro", "março", "abril", "maio", "junho",
+            "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"
+        ];
+
+        // Obtém o dia, mês e ano da data
+        const dia = data.getDate() + 1;
+        const mes = meses[data.getMonth()];
+        const ano = data.getFullYear();
+
+        // Constrói a string no formato desejado
+        const textoCorrido = dia + " de " + mes + " de " + ano;
+
+        return textoCorrido;
+    }
+
+    private verificarDataMenorQueAtual(dataString: string | null): boolean {
+        if (!dataString) {
+            return false;
+        }
+
+        const dataFornecida = new Date(dataString);
+
+        // Obtém a data atual
+        const dataAtual = new Date();
+
+        // Compara as datas
+        return dataFornecida < dataAtual ? true : false;
+    }
 }
 
 const interfaceGrafica = new InterfaceGrafica();
-
-
-
-// botaoEditarTarefa?.addEventListener("click", () => {
-//     exibirDialogEditarTarefa();
-// });
-
-// function exibirDialogEditarTarefa(): void {
-//     dialogEditarTarefa?.classList.remove("hidden");
-// }
-
-// botaoCancelarEditarTarefa?.addEventListener("click", () => {
-//     fecharDialogEditarTarefa();
-// });
-
-// function fecharDialogEditarTarefa(): void {
-//     dialogEditarTarefa?.classList.add("hidden");
-// }
