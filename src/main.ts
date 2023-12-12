@@ -1423,3 +1423,4 @@ class InterfaceGrafica {
 }
 
 const interfaceGrafica = new InterfaceGrafica();
+const quadroTarefa = new QuadroTarefa();
