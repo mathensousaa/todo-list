@@ -161,9 +161,10 @@ class GerenciadorTarefa {
         if (indiceTarefa !== -1 && indiceTarefaAnterior !== -1) {
             const tarefaMovida = this.tarefas.splice(indiceTarefa, 1)[0];
             this.tarefas.splice(indiceTarefaAnterior, 0, tarefaMovida);
+            tarefa.status = novoStatus;
         }
 
-        tarefa.status = novoStatus;
+        
         this.atualizarTarefasNoLocalStorage();
     }
 }
@@ -382,9 +383,7 @@ class GerenciadorCategoria {
             }
 
             categoria.nome = novoNome;
-
-            console.log(categoria);
-
+            
             const indiceParaAtualizar = this.categorias.findIndex(categoria => categoria.id === idCategoria);
             this.categorias[indiceParaAtualizar] = categoria;
             this.atualizarCategoriasNoLocalStorage();
@@ -737,9 +736,7 @@ class InterfaceGrafica {
     }
 
     // Popover
-    private trocarExibicaoPopover(popover: HTMLDivElement): void {
-        console.log(popover);
-        console.log(popover?.classList);
+    private trocarExibicaoPopover(popover: HTMLDivElement): void {        
         if (popover?.classList.contains('hidden')) {
             popover?.classList.remove('hidden');
         } else {
@@ -1319,7 +1316,6 @@ class InterfaceGrafica {
                 if (opcoesCategoria) {
                     opcoesCategoria.forEach((opcao: HTMLOptionElement) => {
                         if (opcao.value === tarefa.categoria?.toString()) {
-                            console.log(opcao.value)
                             opcao.selected = true;
                         }
                     });
